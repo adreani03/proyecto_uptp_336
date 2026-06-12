@@ -1,17 +1,17 @@
 
 <?php
-// init_test_db.php - Script con datos simulados para pruebas de programación
+// init_test_db.php - Script con datos simulados para pruebas de programaciÃ³n
 
 try {
     // 1. Crear y conectar la base de datos en un solo archivo SQLite
     $db = new PDO('sqlite:microbiologia.db');
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    echo "<h2>--- INICIANDO INSTALACIÓN DE LA BASE DE DATOS (MODO TEST) ---</h2>";
+    echo "<h2>--- INICIANDO INSTALACIÃ“N DE LA BASE DE DATOS (MODO TEST) ---</h2>";
 
     // 2. Definir las 6 tablas estructuradas limpiamente
     $sql_tablas = "
-        -- TABLA 1: Categorías
+        -- TABLA 1: CategorÃ­as
         CREATE TABLE IF NOT EXISTS categorias (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
@@ -28,7 +28,8 @@ try {
             cedula TEXT PRIMARY KEY,
             nombre TEXT NOT NULL,
             pnf TEXT,
-            rol TEXT NOT NULL CHECK(rol IN ('administrador', 'docente', 'estudiante', 'investigador'))
+            rol TEXT NOT NULL CHECK(rol IN ('administrador', 'docente', 'estudiante', 'investigador')),
+            password TEXT NOT NULL
         );
 
         -- TABLA 4: Inventario (Equipos y Consumibles juntos)
@@ -49,7 +50,7 @@ try {
             FOREIGN KEY (categoria_id) REFERENCES categorias(id)
         );
 
-        -- TABLA 5: Préstamos
+        -- TABLA 5: PrÃ©stamos
         CREATE TABLE IF NOT EXISTS prestamos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             docente_cedula TEXT NOT NULL,
@@ -67,12 +68,12 @@ try {
             FOREIGN KEY (materia_id) REFERENCES materias(id)
         );
 
-        -- TABLA 6: Movimiento de Inventario (Auditoría de Stock)
+        -- TABLA 6: Movimiento de Inventario (AuditorÃ­a de Stock)
         CREATE TABLE IF NOT EXISTS movimiento_inventario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             inventario_id INTEGER NOT NULL,
             usuario_cedula TEXT NOT NULL,
-            tipo_movimiento TEXT NOT NULL CHECK(tipo_movimiento IN ('Entrada', 'Consumo Directo', 'Extravío', 'Mal Estado')),
+            tipo_movimiento TEXT NOT NULL CHECK(tipo_movimiento IN ('Entrada', 'Consumo Directo', 'ExtravÃ­o', 'Mal Estado')),
             cantidad INTEGER NOT NULL,
             fecha TEXT DEFAULT CURRENT_TIMESTAMP,
             motivo TEXT,
@@ -81,41 +82,42 @@ try {
         );
     ";
 
-    // Ejecutar la creación de las tablas
+    // Ejecutar la creaciÃ³n de las tablas
     $db->exec($sql_tablas);
-    echo "? Las 6 tablas lógicas han sido creadas de forma exitosa.<br>";
+    echo "? Las 6 tablas lÃ³gicas han sido creadas de forma exitosa.<br>";
 
     // 3. Insertar datos simulados para mantener las apariencias con el inventario
     $conteo_productos = $db->query("SELECT COUNT(*) FROM inventario")->fetchColumn();
     
     if ($conteo_productos == 0) {
         
-        // Insertar Categorías básicas
-        $db->exec("INSERT INTO categorias (nombre) VALUES ('Equipos'), ('Reactivos'), ('Vidriería')");
+        // Insertar CategorÃ­as bÃ¡sicas
+        $db->exec("INSERT INTO categorias (nombre) VALUES ('Equipos'), ('Reactivos'), ('VidrierÃ­a')");
         
         // Insertar Materias de Veterinaria
-        $db->exec("INSERT INTO materias (nombre) VALUES ('Microbiología II'), ('Parasitología')");
+        $db->exec("INSERT INTO materias (nombre) VALUES ('MicrobiologÃ­a II'), ('ParasitologÃ­a')");
         
         // Insertar Usuarios de prueba
-        $db->exec("INSERT INTO usuarios (cedula, nombre, pnf, rol) VALUES 
-            ('V-12345678', 'Profesor Jesús Aguiar', 'Veterinaria', 'docente'),
-            ('V-87654321', 'Darwin Encargado', 'Informática', 'administrador')");
+        $hash = password_hash('password123', PASSWORD_DEFAULT);
+        $db->exec("INSERT INTO usuarios (cedula, nombre, pnf, rol, password) VALUES 
+            ('V-12345678', 'Profesor JesÃºs Aguiar', 'Veterinaria', 'docente', '$hash'),
+            ('V-87654321', 'Darwin Encargado', 'InformÃ¡tica', 'administrador', '$hash')");
 
         // Insertar un Equipo (Microscopio) y un Consumible (Agar)
         $db->exec("INSERT INTO inventario (nombre, categoria_id, tipo, serial_codigo, stock_actual, stock_minimo, stock_maximo, estado, ubicacion) VALUES 
-            ('Microscopio Óptico Olympus 01', 1, 'Equipo', 'MIC-OLY-01', 1, 1, 1, 'Disponible', 'Estante A-Estraquina derecha'),
+            ('Microscopio Ã“ptico Olympus 01', 1, 'Equipo', 'MIC-OLY-01', 1, 1, 1, 'Disponible', 'Estante A-Estraquina derecha'),
             ('Agar Nutritivo (Medio de Cultivo)', 2, 'Consumible', NULL, 500, 100, 1000, 'Disponible', 'Nevera de Reactivos N-1')");
 
-        // Simular un préstamo activo
+        // Simular un prÃ©stamo activo
         $db->exec("INSERT INTO prestamos (docente_cedula, inventario_id, materia_id, seccion, estado_entrega) VALUES 
-            ('V-12345678', 1, 1, 'Sección A', 'Disponible')");
+            ('V-12345678', 1, 1, 'SecciÃ³n A', 'Disponible')");
 
         echo "? Datos de prueba e inventario simulado cargados correctamente.<br>";
     }
 
-    echo "<h3>?? ¡Minijuego configurado en modo TEST! Base de datos lista.</h3>";
+    echo "<h3>?? Â¡Minijuego configurado en modo TEST! Base de datos lista.</h3>";
 
 } catch (PDOException $e) {
-    echo "? Ocurrió un error en la base de datos: " . $e->getMessage();
+    echo "? OcurriÃ³ un error en la base de datos: " . $e->getMessage();
 }
 ?>

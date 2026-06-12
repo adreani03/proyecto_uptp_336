@@ -6,11 +6,11 @@ try {
     $db = new PDO('sqlite:microbiologia.db');
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    echo "<h2>--- INICIANDO INSTALACIÓN DE LA BASE DE DATOS (PRODUCCIÓN) ---</h2>";
+    echo "<h2>--- INICIANDO INSTALACIÃ“N DE LA BASE DE DATOS (PRODUCCIÃ“N) ---</h2>";
 
     // 2. Definir las 6 tablas estructuradas limpiamente
     $sql_tablas = "
-        -- TABLA 1: Categorías
+        -- TABLA 1: CategorÃ­as
         CREATE TABLE IF NOT EXISTS categorias (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL UNIQUE
@@ -27,7 +27,8 @@ try {
             cedula TEXT PRIMARY KEY,
             nombre TEXT NOT NULL,
             pnf TEXT,
-            rol TEXT NOT NULL CHECK(rol IN ('administrador', 'docente', 'estudiante', 'investigador'))
+            rol TEXT NOT NULL CHECK(rol IN ('administrador', 'docente', 'estudiante', 'investigador')),
+            password TEXT NOT NULL
         );
 
         -- TABLA 4: Inventario (Equipos y Consumibles juntos)
@@ -48,7 +49,7 @@ try {
             FOREIGN KEY (categoria_id) REFERENCES categorias(id)
         );
 
-        -- TABLA 5: Préstamos
+        -- TABLA 5: PrÃ©stamos
         CREATE TABLE IF NOT EXISTS prestamos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             docente_cedula TEXT NOT NULL,
@@ -66,12 +67,12 @@ try {
             FOREIGN KEY (materia_id) REFERENCES materias(id)
         );
 
-        -- TABLA 6: Movimiento de Inventario (Auditoría de Stock)
+        -- TABLA 6: Movimiento de Inventario (AuditorÃ­a de Stock)
         CREATE TABLE IF NOT EXISTS movimiento_inventario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             inventario_id INTEGER NOT NULL,
             usuario_cedula TEXT NOT NULL,
-            tipo_movimiento TEXT NOT NULL CHECK(tipo_movimiento IN ('Entrada', 'Consumo Directo', 'Extravío', 'Mal Estado')),
+            tipo_movimiento TEXT NOT NULL CHECK(tipo_movimiento IN ('Entrada', 'Consumo Directo', 'ExtravÃ­o', 'Mal Estado')),
             cantidad INTEGER NOT NULL,
             fecha TEXT DEFAULT CURRENT_TIMESTAMP,
             motivo TEXT,
@@ -80,13 +81,13 @@ try {
         );
     ";
 
-    // Ejecutar la creación de las tablas
+    // Ejecutar la creaciÃ³n de las tablas
     $db->exec($sql_tablas);
-    echo "? Las 6 tablas lógicas han sido creadas de forma exitosa.<br>";
+    echo "? Las 6 tablas lÃ³gicas han sido creadas de forma exitosa.<br>";
     
-    echo "<h3>?? ¡Sistema a limpio configurado! Base de datos vacía lista para el inventario real.</h3>";
+    echo "<h3>?? Â¡Sistema a limpio configurado! Base de datos vacÃ­a lista para el inventario real.</h3>";
 
 } catch (PDOException $e) {
-    echo "? Ocurrió un error en la base de datos: " . $e->getMessage();
+    echo "? OcurriÃ³ un error en la base de datos: " . $e->getMessage();
 }
 ?>
