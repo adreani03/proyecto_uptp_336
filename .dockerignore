@@ -1,7 +1,6 @@
 .git
 .gitignore
 .dockerignore
-vendor/
 microbiologia.db
 *.db
 *.sqlite
