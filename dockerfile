@@ -28,7 +28,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 6. Establecer directorio de trabajo y copiar el código de "Proyecto Modificado"
 WORKDIR /var/www/html
-COPY ["Proyecto Modificado/Proyecto Modificado/proyecto_uptp_336-main", "."]
+COPY . .
 
 # 7. Instalar dependencias de Composer para asegurar Dompdf
 RUN composer install --no-interaction --no-dev --optimize-autoloader
@@ -51,12 +51,23 @@ EXPOSE 80
 # docker run -d -p 8080:80 --name uptp336_container uptp336_image
 
 
+# Entra al contenedor como superusuario (root)
+# docker exec -it --user root uptp336_container bash
+
+# Una vez adentro, dale permisos totales a la base de datos (reemplaza la ruta si está en otra carpeta)
+# chmod -R 777 /var/www/html/microbiologia.db
+# chmod 777 /var/www/html
+
+# Sal del contenedor
+# exit
+
+
 
 # Opcion 2:
 # # 1. Borrar contenedor viejo
 # docker rm -f uptp336_container
 
 # # 2. Correr vinculando tu carpeta local de desarrollo directamente al contenedor
-# docker run -d -p 8080:80 --name uptp336_container -v "${PWD}/Proyecto Modificado/Proyecto Modificado/proyecto_uptp_336-main:/var/www/html" uptp336_image
+# docker run -d -p 8080:80 --name uptp336_container -v "${PWD}:/var/www/html" uptp336_image
 
 # docker exec -it uptp336_container php /var/www/html/init_test_db.php
