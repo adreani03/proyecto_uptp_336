@@ -1,0 +1,8 @@
+.git
+.gitignore
+.dockerignore
+microbiologia.db
+*.db
+*.sqlite
+composer.lock
+Dockerfile

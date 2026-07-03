@@ -151,6 +151,12 @@
             <p style="color: var(--text-muted); margin-top: 0.5rem;">Registra un nuevo reactivo o equipo en el inventario</p>
         </header>
 
+        <?php if (isset($_SESSION['error'])): ?>
+            <div style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; color: #fca5a5;">
+                <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+
         <div class="glass-card">
             <form action="<?= BASE_URL ?>/inventario/crear" method="POST">
                 <div class="form-grid">

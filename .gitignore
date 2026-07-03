@@ -1,0 +1,6 @@
+/microbiologia.db
+*.db
+*.sqlite
+.DS_Store
+.idea/
+.vscode/

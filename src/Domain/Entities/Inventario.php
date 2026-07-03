@@ -31,6 +31,15 @@ class Inventario {
         ?string $ubicacion,
         ?string $hojaSeguridad
     ) {
+        if ($stockActual < 0) {
+            throw new \InvalidArgumentException("El stock actual no puede ser negativo.");
+        }
+        if ($stockMinimo < 0) {
+            throw new \InvalidArgumentException("El stock mínimo no puede ser negativo.");
+        }
+        if ($stockMaximo < 0) {
+            throw new \InvalidArgumentException("El stock máximo no puede ser negativo.");
+        }
         $this->id = $id;
         $this->nombre = $nombre;
         $this->categoriaId = $categoriaId;
