@@ -36,7 +36,7 @@
                 <button type="submit" class="btn-primary">Ingresar</button>
             </form>
             <div class="login-footer">
-                <p>¿Problemas para acceder? Contacta al administrador.</p>
+                <p>...</p>
             </div>
         </div>
         <div class="background-blobs">

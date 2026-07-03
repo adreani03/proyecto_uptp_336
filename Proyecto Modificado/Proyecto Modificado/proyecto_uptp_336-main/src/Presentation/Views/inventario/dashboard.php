@@ -406,6 +406,7 @@
             margin-top: auto;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -470,64 +471,138 @@
         <!-- Dashboard Grid (Activity + Actions) -->
         <div class="dashboard-grid">
 
-            <!-- Recent Activity -->
+            <!-- Recent Activity replaced with Inventory Bar Chart -->
             <div class="section-card">
                 <h2 class="section-title">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
                         viewBox="0 0 16 16" style="color: var(--primary);">
-                        <path
-                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.5-13v5.793l2.146 2.147a.5.5 0 0 1-.708.708l-2.5-2.5A.5.5 0 0 1 7 8.5V3a.5.5 0 0 1 1 0z" />
+                        <path d="M4 11H2v3h2v-3zm5-4H7v7h2V7zm5-5v12h-2V2h2zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1h-2zM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>
                     </svg>
-                    Movimientos Recientes
+                    Nivel de Stock - Artículos Principales
                 </h2>
 
-                <?php if (empty($movimientos)): ?>
-                    <div class="empty-activity">
-                        No se han registrado movimientos de inventario recientes.
-                    </div>
-                <?php else: ?>
-                    <div class="activity-list">
-                        <?php foreach ($movimientos as $mov):
-                            $indicatorClass = 'act-consumo';
-                            $symbol = '⇄';
-                            $tipoMov = $mov['tipo_movimiento'];
-                            if (strpos(strtolower($tipoMov), 'entrada') !== false) {
-                                $indicatorClass = 'act-entrada';
-                                $symbol = '↓';
-                            } elseif (strpos(strtolower($tipoMov), 'consumo') !== false) {
-                                $indicatorClass = 'act-consumo';
-                                $symbol = '↑';
-                            } elseif (strpos(strtolower($tipoMov), 'extrav') !== false) {
-                                $indicatorClass = 'act-extravio';
-                                $symbol = '?';
-                            } elseif (strpos(strtolower($tipoMov), 'mal') !== false || strpos(strtolower($tipoMov), 'estado') !== false) {
-                                $indicatorClass = 'act-dañado';
-                                $symbol = '❌';
+                <?php
+                // Ordenar por stock_actual desc y tomar los 8 primeros
+                $chartItems = $inventarios;
+                usort($chartItems, function($a, $b) {
+                    return $b->getStockActual() <=> $a->getStockActual();
+                });
+                $topItems = array_slice($chartItems, 0, 8);
+
+                $labels = [];
+                $actual = [];
+                $minimo = [];
+                foreach ($topItems as $item) {
+                    $labels[] = $item->getNombre();
+                    $actual[] = $item->getStockActual();
+                    $minimo[] = $item->getStockMinimo();
+                }
+                ?>
+
+                <div class="chart-container" style="position: relative; height: 350px; width: 100%;">
+                    <canvas id="inventoryBarChart"></canvas>
+                </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const ctx = document.getElementById('inventoryBarChart').getContext('2d');
+                        
+                        // Gradients for modern corporate style
+                        const gradientActual = ctx.createLinearGradient(0, 0, 0, 350);
+                        gradientActual.addColorStop(0, '#38bdf8'); // primary
+                        gradientActual.addColorStop(1, '#0284c7');
+
+                        const gradientMinimo = ctx.createLinearGradient(0, 0, 0, 350);
+                        gradientMinimo.addColorStop(0, '#f87171'); // light red
+                        gradientMinimo.addColorStop(1, '#ef4444'); // danger red
+
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: <?= json_encode($labels) ?>,
+                                datasets: [
+                                    {
+                                        label: 'Stock Actual',
+                                        data: <?= json_encode($actual) ?>,
+                                        backgroundColor: gradientActual,
+                                        borderRadius: 8,
+                                        borderSkipped: false,
+                                        barPercentage: 0.6,
+                                        categoryPercentage: 0.7
+                                    },
+                                    {
+                                        label: 'Stock Mínimo',
+                                        data: <?= json_encode($minimo) ?>,
+                                        backgroundColor: gradientMinimo,
+                                        borderRadius: 8,
+                                        borderSkipped: false,
+                                        barPercentage: 0.6,
+                                        categoryPercentage: 0.7
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: {
+                                            color: '#94a3b8', // text-muted
+                                            font: {
+                                                family: 'Outfit',
+                                                size: 13
+                                            },
+                                            usePointStyle: true,
+                                            pointStyle: 'circle'
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                        titleFont: { family: 'Outfit', size: 14, weight: 'bold' },
+                                        bodyFont: { family: 'Outfit', size: 13 },
+                                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                                        borderWidth: 1,
+                                        padding: 12,
+                                        displayColors: true,
+                                        callbacks: {
+                                            label: function(context) {
+                                                return ` ${context.dataset.label}: ${context.raw} unidades`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            color: '#94a3b8',
+                                            font: {
+                                                family: 'Outfit',
+                                                size: 11
+                                            }
+                                        }
+                                    },
+                                    y: {
+                                        grid: {
+                                            color: 'rgba(255, 255, 255, 0.05)',
+                                            drawBorder: false
+                                        },
+                                        ticks: {
+                                            color: '#94a3b8',
+                                            font: {
+                                                family: 'Outfit',
+                                                size: 11
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            ?>
-                            <div class="activity-item">
-                                <div class="activity-icon-indicator <?= $indicatorClass ?>"><?= $symbol ?></div>
-                                <div class="activity-content">
-                                    <div class="activity-header">
-                                        <span class="activity-user"><?= htmlspecialchars($mov['usuario_nombre']) ?></span>
-                                        <span class="activity-time"><?= date('d/m/Y H:i', strtotime($mov['fecha'])) ?></span>
-                                    </div>
-                                    <div class="activity-text">
-                                        Registró una <strong><?= htmlspecialchars($mov['tipo_movimiento']) ?></strong> de
-                                        <strong><?= $mov['cantidad'] ?> unidad(es)</strong> del artículo
-                                        <strong><?= htmlspecialchars($mov['articulo_nombre']) ?></strong>.
-                                        <?php if (!empty($mov['motivo'])): ?>
-                                            <span
-                                                style="display: block; font-style: italic; margin-top: 0.25rem; font-size: 0.8rem; color: var(--text-muted);">
-                                                Motivo: "<?= htmlspecialchars($mov['motivo']) ?>"
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                        });
+                    });
+                </script>
             </div>
 
             <!-- Quick Actions -->

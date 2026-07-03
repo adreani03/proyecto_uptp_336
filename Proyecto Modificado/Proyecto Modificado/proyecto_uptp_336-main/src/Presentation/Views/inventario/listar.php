@@ -29,7 +29,7 @@ if (file_exists($dbPath)) {
     $errorMsg = 'No se encontró microbiologia.db';
 }
 
-$tables = ['categorias', 'inventario', 'materias', 'movimiento_inventario', 'prestamos', 'usuarios'];
+$tables = ['categorias', 'inventario', 'usuarios']; # 'materias', 'movimiento_inventario', 'prestamos',
 $tableData = [];
 $tableColumns = [];
 

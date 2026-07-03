@@ -59,3 +59,4 @@ EXPOSE 80
 # # 2. Correr vinculando tu carpeta local de desarrollo directamente al contenedor
 # docker run -d -p 8080:80 --name uptp336_container -v "${PWD}/Proyecto Modificado/Proyecto Modificado/proyecto_uptp_336-main:/var/www/html" uptp336_image
 
+# docker exec -it uptp336_container php /var/www/html/init_test_db.php

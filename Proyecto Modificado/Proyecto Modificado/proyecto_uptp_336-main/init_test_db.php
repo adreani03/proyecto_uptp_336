@@ -100,12 +100,12 @@ try {
         // Insertar Usuarios de prueba
         $hash = password_hash('password123', PASSWORD_DEFAULT);
         $db->exec("INSERT INTO usuarios (cedula, nombre, pnf, rol, password) VALUES 
-            ('V-12345678', 'Profesor Jesús Aguiar', 'Veterinaria', 'docente', '$hash'),
-            ('V-87654321', 'Darwin Encargado', 'Informática', 'administrador', '$hash')");
+            ('V-12345678', 'Docente', 'Veterinaria', 'docente', '$hash'),
+            ('V-87654321', 'Administrador', 'Informática', 'administrador', '$hash')");
 
         // Insertar un Equipo (Microscopio) y un Consumible (Agar)
         $db->exec("INSERT INTO inventario (nombre, categoria_id, tipo, serial_codigo, stock_actual, stock_minimo, stock_maximo, estado, ubicacion) VALUES 
-            ('Microscopio Óptico Olympus 01', 1, 'Equipo', 'MIC-OLY-01', 1, 1, 1, 'Disponible', 'Estante A-Estraquina derecha'),
+            ('Microscopio', 1, 'Equipo', 'MIC-OLY-01', 1, 1, 1, 'Disponible', 'Estante A-Estraquina derecha'),
             ('Agar Nutritivo (Medio de Cultivo)', 2, 'Consumible', NULL, 500, 100, 1000, 'Disponible', 'Nevera de Reactivos N-1')");
 
         // Simular un préstamo activo
