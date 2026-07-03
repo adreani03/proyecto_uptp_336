@@ -42,6 +42,16 @@ class InventarioController {
     public function store(): void {
         $this->checkAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $stockActual = isset($_POST['stock_actual']) ? (int)$_POST['stock_actual'] : 0;
+            $stockMinimo = isset($_POST['stock_minimo']) ? (int)$_POST['stock_minimo'] : 0;
+            $stockMaximo = isset($_POST['stock_maximo']) ? (int)$_POST['stock_maximo'] : 0;
+
+            if ($stockActual < 0 || $stockMinimo < 0 || $stockMaximo < 0) {
+                $_SESSION['error'] = "Los valores de stock (actual, mínimo y máximo) no pueden ser negativos.";
+                header('Location: ' . BASE_URL . '/inventario/crear');
+                exit;
+            }
+
             $inventario = new Inventario(
                 null,
                 $_POST['nombre'] ?? '',
@@ -50,9 +60,9 @@ class InventarioController {
                 ($_POST['serial_codigo'] ?? '') ?: null,
                 ($_POST['numero_lote'] ?? '') ?: null,
                 ($_POST['fecha_vencimiento'] ?? '') ?: null,
-                isset($_POST['stock_actual']) ? (int)$_POST['stock_actual'] : 0,
-                isset($_POST['stock_minimo']) ? (int)$_POST['stock_minimo'] : 0,
-                isset($_POST['stock_maximo']) ? (int)$_POST['stock_maximo'] : 0,
+                $stockActual,
+                $stockMinimo,
+                $stockMaximo,
                 $_POST['estado'] ?? 'Disponible',
                 ($_POST['ubicacion'] ?? '') ?: null,
                 ($_POST['hoja_seguridad'] ?? '') ?: null
@@ -84,6 +94,16 @@ class InventarioController {
         $this->checkAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+            $stockActual = isset($_POST['stock_actual']) ? (int)$_POST['stock_actual'] : 0;
+            $stockMinimo = isset($_POST['stock_minimo']) ? (int)$_POST['stock_minimo'] : 0;
+            $stockMaximo = isset($_POST['stock_maximo']) ? (int)$_POST['stock_maximo'] : 0;
+
+            if ($stockActual < 0 || $stockMinimo < 0 || $stockMaximo < 0) {
+                $_SESSION['error'] = "Los valores de stock (actual, mínimo y máximo) no pueden ser negativos.";
+                header('Location: ' . BASE_URL . '/inventario/editar?id=' . $id);
+                exit;
+            }
+
             $inventario = new Inventario(
                 $id,
                 $_POST['nombre'] ?? '',
@@ -92,9 +112,9 @@ class InventarioController {
                 ($_POST['serial_codigo'] ?? '') ?: null,
                 ($_POST['numero_lote'] ?? '') ?: null,
                 ($_POST['fecha_vencimiento'] ?? '') ?: null,
-                isset($_POST['stock_actual']) ? (int)$_POST['stock_actual'] : 0,
-                isset($_POST['stock_minimo']) ? (int)$_POST['stock_minimo'] : 0,
-                isset($_POST['stock_maximo']) ? (int)$_POST['stock_maximo'] : 0,
+                $stockActual,
+                $stockMinimo,
+                $stockMaximo,
                 $_POST['estado'] ?? 'Disponible',
                 ($_POST['ubicacion'] ?? '') ?: null,
                 ($_POST['hoja_seguridad'] ?? '') ?: null

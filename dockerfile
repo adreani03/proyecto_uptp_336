@@ -34,7 +34,10 @@ COPY . .
 RUN composer install --no-interaction --no-dev --optimize-autoloader
 
 # 8. Dar permisos correctos a las carpetas para que Apache pueda escribir (especialmente para microbiologia.db)
-RUN chown -R www-data:www-data /var/www/html
+RUN touch /var/www/html/microbiologia.db && \
+    chmod -R 777 /var/www/html/microbiologia.db && \
+    chmod 777 /var/www/html && \
+    chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
 
@@ -71,3 +74,7 @@ EXPOSE 80
 # docker run -d -p 8080:80 --name uptp336_container -v "${PWD}:/var/www/html" uptp336_image
 
 # docker exec -it uptp336_container php /var/www/html/init_test_db.php
+
+
+# opcion 3: servidor local con php:
+#     php -S localhost:8000
